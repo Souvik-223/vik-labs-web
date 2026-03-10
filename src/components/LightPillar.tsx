@@ -47,7 +47,7 @@ const LightPillar: React.FC<LightPillarProps> = ({
   useEffect(() => {
     const canvas = document.createElement("canvas");
     const gl =
-      canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      canvas.getContext("webgl") ?? canvas.getContext("experimental-webgl");
     if (!gl) {
       setWebGLSupported(false);
     }
@@ -354,12 +354,15 @@ const LightPillar: React.FC<LightPillarProps> = ({
 
       if (deltaTime >= frameTime) {
         timeRef.current += 0.016 * rotationSpeed;
-        materialRef.current.uniforms.uTime.value = timeRef.current;
+        if (materialRef.current.uniforms["uTime"])
+          materialRef.current.uniforms["uTime"].value = timeRef.current;
 
         // Pre-compute rotation on CPU
         const rotAngle = timeRef.current * 0.3;
-        materialRef.current.uniforms.uRotCos.value = Math.cos(rotAngle);
-        materialRef.current.uniforms.uRotSin.value = Math.sin(rotAngle);
+        if (materialRef.current.uniforms["uRotCos"])
+          materialRef.current.uniforms["uRotCos"].value = Math.cos(rotAngle);
+        if (materialRef.current.uniforms["uRotSin"])
+          materialRef.current.uniforms["uRotSin"].value = Math.sin(rotAngle);
 
         rendererRef.current.render(sceneRef.current, cameraRef.current);
         lastTime = currentTime - (deltaTime % frameTime);
@@ -386,7 +389,12 @@ const LightPillar: React.FC<LightPillarProps> = ({
         const newWidth = containerRef.current.clientWidth;
         const newHeight = containerRef.current.clientHeight;
         rendererRef.current.setSize(newWidth, newHeight);
-        materialRef.current.uniforms.uResolution.value.set(newWidth, newHeight);
+        if (materialRef.current.uniforms["uResolution"]) {
+          (materialRef.current.uniforms["uResolution"].value as THREE.Vector2).set(
+            newWidth,
+            newHeight,
+          );
+        }
       }, 150);
     };
 

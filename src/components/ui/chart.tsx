@@ -173,7 +173,7 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        "border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
         className,
       )}
     >
@@ -184,7 +184,8 @@ function ChartTooltipContent({
           .map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
-            const indicatorColor = color || item.payload.fill || item.color;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const indicatorColor = color ?? item.payload.fill ?? item.color;
 
             return (
               <div
@@ -195,6 +196,7 @@ function ChartTooltipContent({
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
@@ -215,7 +217,9 @@ function ChartTooltipContent({
                           )}
                           style={
                             {
+                              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                               "--color-bg": indicatorColor,
+                              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                               "--color-border": indicatorColor,
                             } as React.CSSProperties
                           }
@@ -280,7 +284,8 @@ function ChartLegendContent({
       {payload
         .filter((item) => item.type !== "none")
         .map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const key = `${nameKey ?? item.dataKey ?? "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
           return (

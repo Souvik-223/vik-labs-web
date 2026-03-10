@@ -17,8 +17,27 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 import Link from "next/link";
+import { env } from "~/env";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Type-safe Calendly window extension — avoids `window as any` everywhere
+interface CalendlyBadgeWidgetOptions {
+  url: string;
+  text: string;
+  color: string;
+  textColor: string;
+  branding: boolean;
+}
+interface CalendlyGlobal {
+  initBadgeWidget: (options: CalendlyBadgeWidgetOptions) => void;
+  initInlineWidgets?: () => void;
+}
+declare global {
+  interface Window {
+    Calendly?: CalendlyGlobal;
+  }
+}
 
 export default function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -69,9 +88,8 @@ export default function CTASection() {
     if (!mounted) return;
     // Give Calendly's script a tick to attach, then call initInlineWidgets
     const initInline = () => {
-      const cal = (window as any).Calendly;
-      if (cal?.initInlineWidgets) {
-        cal.initInlineWidgets();
+      if (window.Calendly?.initInlineWidgets) {
+        window.Calendly.initInlineWidgets();
       }
     };
     // If already loaded, call immediately; else poll until it's ready
@@ -97,21 +115,21 @@ export default function CTASection() {
       script.src = "https://assets.calendly.com/assets/external/widget.js";
       script.async = true;
       script.onload = () => {
-        (window as any).Calendly?.initBadgeWidget({
-          url: "https://calendly.com/tanishbasu/30min",
+        window.Calendly?.initBadgeWidget({
+          url: env.NEXT_PUBLIC_CALENDLY_URL,
           text: "Schedule time with me",
           color: "#1f2123",
           textColor: "#ffffff",
           branding: true,
         });
         // Also init inline widgets in case the div is already mounted
-        (window as any).Calendly?.initInlineWidgets?.();
+        window.Calendly?.initInlineWidgets?.();
       };
       document.body.appendChild(script);
     } else {
       // Script already present — init badge manually if not already done
-      (window as any).Calendly?.initBadgeWidget?.({
-        url: "https://calendly.com/tanishbasu/30min",
+      window.Calendly?.initBadgeWidget({
+        url: env.NEXT_PUBLIC_CALENDLY_URL,
         text: "Schedule time with me",
         color: "#1f2123",
         textColor: "#ffffff",
@@ -217,7 +235,7 @@ export default function CTASection() {
               className="group h-12 w-fit rounded-xl bg-white px-7 font-bold text-black hover:bg-white/90"
             >
               <Link
-                href="https://calendly.com/tanishbasu/30min"
+                href={env.NEXT_PUBLIC_CALENDLY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -261,7 +279,7 @@ export default function CTASection() {
               /* Only rendered after client hydration — Calendly mutates this div immediately */
               <div
                 className="calendly-inline-widget h-full min-h-[680px] w-full"
-                data-url="https://calendly.com/tanishbasu/30min?hide_gdpr_banner=1&background_color=0a0a0a&text_color=ffffff&primary_color=ffffff"
+                data-url={`${env.NEXT_PUBLIC_CALENDLY_URL}?hide_gdpr_banner=1&background_color=0a0a0a&text_color=ffffff&primary_color=ffffff`}
                 style={{ minWidth: "320px", height: "680px" }}
               />
             ) : (

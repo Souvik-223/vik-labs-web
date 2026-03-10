@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Twitter, Github, Linkedin, Youtube } from "lucide-react";
+
 import { footerLinks, socials } from "~/lib/const";
 import Link from "next/link";
 

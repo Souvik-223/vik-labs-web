@@ -90,7 +90,7 @@ export default function WorkSection() {
 
         {/* Project list */}
         <div className="project-list">
-          {projects.map((project, i) => (
+          {projects.map((project) => (
             <div
               key={project.id}
               className={`project-row group flex cursor-pointer flex-col gap-6 border-b border-white/6 py-8 transition-all duration-300 md:flex-row md:items-center ${
